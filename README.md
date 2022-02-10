@@ -193,7 +193,86 @@ Se puede instalar de manera global: `npm install -g pm2`
 
 ### 7. Callbacks
 
+Una funcion callback es una funcion que es pasada como argumento a otra funcion, para ser llamada(`called back`) en otro momento.
+La funcion que recibe como argumento otras funciones es denominada funcion de orden superior (higher-order function), esta contiene la logica correspondiente para ejecutar adecuadamente la funcion callback.
+
+En el siguiente codigo
+
+```javascript
+setTimeout(() => {
+    console.log('Hello');
+}, 1000)
+```
+
+`setTimeout` es una higher-order function y tiene un callback function que se ejecutará luego del tiempo indicado.
+
 ### 8. Callback Hell: refactorizar o sufrir
+
+Los callback Hell se dan cuando empiezo a pasar una función como parámetro que a su vez llama a otra función como parámetro, y así hasta n.
+Una estrategia para trabajar con estas estructuras lógicas tan monolíticas es usar estructuras de control y funciones recursivas.
+
+Las funciones recursivas se llaman así mismas y mediante la estructura de control le digo cuantas veces voy a necesitar llamar la función así misma.
+
+```js
+function hola (nombre, callback){
+    setTimeout(() => {
+        console.log(`Hola ${nombre}...`);
+        callback(nombre);
+    }, 1000);
+}
+
+function adios (nombre, callback){
+    setTimeout(() => {
+        console.log(`Adios ${nombre}`);
+        callback();
+    }, 1000);
+}
+
+function hablar (callback){
+    setTimeout(() => {
+        console.log('Bla bla bla...');
+        callback();
+    }, 1000);
+}
+
+//callbackHell
+//Queremos ejecutar hablar() varias veces
+/*console.log('Iniciando...');
+hola('Rem', function(nombre){
+    hablar(function(){
+        hablar(function(){
+            hablar(function(){
+                hablar(function(){
+                    adios(nombre, function(){
+                        console.log('Finalizando');
+                    });
+                });
+            });
+        });
+    });
+}); */
+
+//Solución al callback hell
+function conversacion (nombre, veces, callback){
+    if(veces > 0){
+        hablar(function(){
+            conversacion(nombre, --veces, callback);
+        })
+    } else {
+        adios(nombre, callback);
+    }
+
+}
+
+console.log('Iniciando....');
+hola('Rem', function(nombre){
+    conversacion(nombre, 4, function(){
+        console.log('Terminado.....');
+    })
+});
+```
+
+
 
 ### 9. Promesas
 
