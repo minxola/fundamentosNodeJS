@@ -4,6 +4,10 @@ Por: **Carlos Hernandez**
 
 Redes: [@CodingCarlos]()
 
+[TOC]
+
+
+
 ## Conocer los conceptos básicos de Node.js
 
 ### 1. Instalación de Node.js
@@ -331,7 +335,157 @@ asyncCall();
 
 ### 11. Globals
 
+En el navegador el objeto global es **window**. **this** hace referencia a **windows**.
+
+En Node.js el objeto global es **global**. **this** hace referencia a **global**.
+
+En node tenemos el objeto **global** que contiene los métodos y propiedades básicas que usamos en node.js.
+
+En node `this` es un alias de `global`
+
+Algunos métodos que se incluyen en el objeto **global** son:
+
+- `setTimeout`: ejecuta una función callback después de un tiempo determinado
+- `setInterval`: ejecuta una función callback cada cierto tiempo
+- `setImmediate`: ejecuta una función callback inmediatamente, como un *setTimeout* con tiempo de 0. Por lo tanto es asíncrona, se ejecutará luego que el hijo esté libre.
+- `clearTimeout`: detiene a una función **setTimeout**
+- `clearInterval`: detiene a una función **setInterval**
+
+>  En Node.js, cada archivo es tratado como un módulo.
+
+Hay variables en Node.js que pueden parecer globales, pero no lo son, estas variables existen solo en el *scope* del módulo:
+
+- `__dirname` el directorio del módulo
+- `__filename` el archivo del módulo
+- `exports` hace referencia al exportar el módulo actual
+- `module` hace referencia al módulo actual
+- `require()` usado para importar módulos, json y otros archivos locales.
+
 ### 12. File system
+
+The Node.js file system module allows you to work with the file system on your computer.
+
+To include the File System module, use the `require()` method:
+
+```js
+var fs = require('fs');
+```
+
+ Common use for the File System module:
+
+- Read files
+- Create files
+- Update files
+- Delete files
+- Rename files
+
+#### Read files
+
+The `fs.readFile()` method is used to read files on your computer.
+
+#### Create files
+
+The File System module has methods for creating new files:
+
+- `fs.appendFile()`
+- `fs.open()`
+- `fs.writeFile()`
+
+The `fs.appendFile()` method appends specified content to a file. If the file does not exist, the file will be created.
+
+```js
+var fs = require('fs');
+
+fs.appendFile('mynewfile1.txt', 'Hello content!', function (err) {
+  if (err) throw err;
+  console.log('Saved!');
+});
+```
+
+
+
+The `fs.open()` method takes a "flag" as the second argument, if the flag is "w" for "writing", the specified file is opened for writing. If the file does not exist, an empty file is created.
+
+```js
+var fs = require('fs');
+
+fs.open('mynewfile2.txt', 'w', function (err, file) {
+  if (err) throw err;
+  console.log('Saved!');
+});
+```
+
+
+
+The `fs.writeFile()` method replaces the specified file and content if it exists. If the file does not exist, a new file, containing the specified content, will be created.
+
+```js
+var fs = require('fs');
+
+fs.writeFile('mynewfile3.txt', 'Hello content!', function (err) {
+  if (err) throw err;
+  console.log('Saved!');
+});
+```
+
+#### Update files
+
+The File System module has methods for updating files:
+
+- `fs.appendFile()`
+- `fs.writeFile()`
+
+The `fs.appendFile()` method appends the specified content at the end of the specified file:
+
+```js
+var fs = require('fs');
+
+fs.appendFile('mynewfile1.txt', ' This is my text.', function (err) {
+  if (err) throw err;
+  console.log('Updated!');
+});
+```
+
+The `fs.writeFile()` method replaces the specified file and content:
+
+```js
+var fs = require('fs');
+
+fs.writeFile('mynewfile3.txt', 'This is my text', function (err) {
+  if (err) throw err;
+  console.log('Replaced!');
+});
+```
+
+#### Delete files
+
+To delete a file with the File System module, use the `fs.unlink()` method.
+
+The `fs.unlink()` method deletes the specified file:
+
+```js
+var fs = require('fs');
+
+fs.unlink('mynewfile2.txt', function (err) {
+  if (err) throw err;
+  console.log('File deleted!');
+});
+```
+
+#### Rename files
+
+To rename a file with the File System module, use the `fs.rename()` method.
+
+The `fs.rename()` method renames the specified file:
+
+```js
+var fs = require('fs');
+
+fs.rename('mynewfile1.txt', 'myrenamedfile.txt', function (err) {
+  if (err) throw err;
+  console.log('File Renamed!');
+});
+```
 
 ### 13. Console
 
