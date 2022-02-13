@@ -489,6 +489,20 @@ fs.rename('mynewfile1.txt', 'myrenamedfile.txt', function (err) {
 
 ### 13. Console
 
+El objeto `console` nos permite pasar información a la consola y lo podemos usar según el tipo de información que queremos transmitir:
+
+- `console.log()` para pasar cualquier tipo de información a la consola
+- `console.info()` para enviar información sobre algo
+- `console.error()` para mostrar un error
+- `console.warn()` usado para mostrar una advertencia
+- `console.count()` para mostrar un contador auto incremental
+- `console.countReset()` para reiniciar el contador
+- `console.time()` para iniciar un cronómetro en milisegundos
+- `console.timeEnd()` para finalizar el cronómetro
+- `console.group()` permite agrupar información en la consola
+- `console.groupEnd()` finaliza la agrupación
+- `console.clear()` para limpiar la consola
+
 ### 14. Errores (try / catch)
 
 ### 15. Procesos hijo
