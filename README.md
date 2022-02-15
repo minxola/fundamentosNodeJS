@@ -505,7 +505,66 @@ El objeto `console` nos permite pasar información a la consola y lo podemos usa
 
 ### 14. Errores (try / catch)
 
+Cuando sucede un error y no es manejado adecuadamente en Node.js, la aplicación y posterior ejecución del código se detiene.
+
+Cada hilo funciona de manera independiente, por lo que en funciones asíncronas el error debe ser manejado dentro de las mismas, ya que estas pasarán a resolverse en el **Thread Pool** y el error se mandará desde allí hacia el hilo principal y detendrá la aplicación.
+
+```js
+//Capturan el error en una función
+function main (){
+    return 1 + x;
+}
+
+try{
+    main();
+} catch (err){
+    console.error('Algo salio mal...');
+    console.error(err.message);
+}
+
+//El error es capturado y se propaga hacia la función raíz
+function foo (){
+    myFunc();
+}
+
+function myFunc(){
+    return 1 + y;
+}
+
+try {
+    foo();
+} catch (e){
+    console.error('HUBO UN ERRO');
+    console.error(e.message);
+}
+
+//En funciones asincronas se debe hacer try y catch en
+//la función asincrona, ya que no pasan directamente al
+//hilo principal
+function asyncrona (callback){
+    setTimeout(function(){
+        try {
+            return 1 + z;
+        } catch (e){
+            console.error('Hubo error en la función asíncrona...');
+            callback(e);
+        }
+    }, 1000);
+}
+
+try {
+    asyncrona(function(err){
+        console.log(err.message);
+    });
+} catch (e){
+    console.error('Hubo un error');
+    console.error(e);
+}
+```
+
 ### 15. Procesos hijo
+
+
 
 ### 16. Módulos nativos en C++
 
