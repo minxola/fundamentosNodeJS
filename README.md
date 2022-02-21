@@ -755,15 +755,165 @@ server.listen(8000);
 
 ```
 
-
-
 ### 18. OS
 
+El modulo de OS, Operative System, nos permite ejecutar acciones de más bajo nivel en nuestro sistema, permitiéndonos conocer una gran variedad de detalles del mismo.
+Como la memoria disponible que tiene, el total de la memoria, la interfaz de red, etc.
+Esto nos será de gran ayuda a la hora de ejecutar o crear proyectos que necesiten información de una maquina para ejecutar una operación.
+
+Podemos acceder a las propiedades y métodos usando:
+
+```js
+const os = require('os');
+
+//tipo de arquitectura
+console.log(os.arch());
+
+//plataforma: android, windows, linux, etc
+console.log(os.platform());
+
+//cpus
+const cpus = os.cpus();
+console.log('Tengo : ' + cpus.length + ' cpus');
+
+//system signals
+console.log(os.constants.priority);
+
+//free memory
+const SIZE = 1024;
+let bytes = os.freemem();
+function kb(bytes){return bytes / SIZE};
+function mg(bytes){return kb(bytes) / SIZE};
+function gb(bytes){return mg(bytes) / SIZE};
+console.log(bytes);
+console.log(kb(bytes));
+console.log(mg(bytes));
+console.log(gb(bytes));
+
+//total memory
+console.log(`Total memory: ${gb(os.totalmem())}`);
+
+//root user directory
+console.log(`Home dir: ${os.homedir()}`);
+
+//temp dir
+console.log(`Temp dir: ${os.tmpdir()}`);
+
+//hostname in servers
+console.log(`Hostname: ${os.hostname()}`);
+
+//network interfaces
+console.log(os.networkInterfaces());
+```
+
 ### 19. Process
+
+The `process` object provides information about, and control over, the current Node.js process. While it is available as a global, it is recommended to explicitly access it via require or import:
+
+```js
+import process from 'process';
+```
+
+**The `process` events:**
+
+#### beforeExit
+
+**beforeExit** , evento para enviar algo antes que pare un proceso.
+
+The `'beforeExit'` event is emitted when Node.js empties its event loop and has no additional work to schedule. Normally, the Node.js process will exit when there is no work scheduled, but a listener registered on the `'beforeExit'` event can make asynchronous calls, and thereby cause the Node.js process to continue.
+
+The listener callback function is invoked with the value of [`process.exitCode`](https://nodejs.org/api/process.html#processexitcode) passed as the only argument.
+
+The `'beforeExit'` event is *not* emitted for conditions causing explicit termination, such as calling [`process.exit()`](https://nodejs.org/api/process.html#processexitcode) or uncaught exceptions.
+
+The `'beforeExit'` should *not* be used as an alternative to the `'exit'` event unless the intention is to schedule additional work.
+
+```js
+import process from 'process';
+
+process.on('beforeExit', (code) => {
+  console.log('Process beforeExit event with code: ', code);
+});
+
+process.on('exit', (code) => {
+  console.log('Process exit event with code: ', code);
+});
+
+console.log('This message is displayed first.');
+
+// Prints:
+// This message is displayed first.
+// Process beforeExit event with code: 0
+// Process exit event with code: 0
+```
+
+#### exit
+
+The `'exit'` event is emitted when the Node.js process is about to exit as a result of either:
+
+- The `process.exit()` method being called explicitly;
+- The Node.js event loop no longer having any additional work to perform.
+
+There is no way to prevent the exiting of the event loop at this point, and once all `'exit'` listeners have finished running the Node.js process will terminate.
+
+The listener callback function is invoked with the exit code specified either by the [`process.exitCode`](https://nodejs.org/api/process.html#processexitcode) property, or the `exitCode` argument passed to the [`process.exit()`](https://nodejs.org/api/process.html#processexitcode) method.
+
+```js
+import process from 'process';
+
+process.on('exit', (code) => {
+  console.log(`About to exit with code: ${code}`);
+});
+```
+
+Listener functions **must** only perform **synchronous** operations. The Node.js process will exit immediately after calling the `'exit'` event listeners causing any additional work still queued in the event loop to be abandoned. In the following example, for instance, the timeout will never occur:
+
+```js
+import process from 'process';
+
+process.on('exit', (code) => {
+  setTimeout(() => {
+    console.log('This will not run');
+  }, 0);
+});
+```
+
+#### uncaughtException
+
+The `'uncaughtException'` event is emitted when an uncaught JavaScript exception bubbles all the way back to the event loop. By default, Node.js handles such exceptions by printing the stack trace to `stderr` and exiting with code 1, overriding any previously set [`process.exitCode`](https://nodejs.org/api/process.html#processexitcode). Adding a handler for the `'uncaughtException'` event overrides this default behavior. Alternatively, change the [`process.exitCode`](https://nodejs.org/api/process.html#processexitcode) in the `'uncaughtException'` handler which will result in the process exiting with the provided exit code. Otherwise, in the presence of such handler the process will exit with 0.
+
+```js
+import process from 'process';
+
+process.on('uncaughtException', (err, origin) => {
+  fs.writeSync(
+    process.stderr.fd,
+    `Caught exception: ${err}\n` +
+    `Exception origin: ${origin}`
+  );
+});
+
+setTimeout(() => {
+  console.log('This will still run.');
+}, 500);
+
+// Intentionally cause an exception, but don't catch it.
+nonexistentFunc();
+console.log('This will not run.');
+
+//result:
+/*
+Caught exception: ReferenceError: nonexistentFunc is not defined
+Exception origin: uncaughtException
+This will still run.
+*/
+```
 
 ## Utilizar los módulos y paquetes externos
 
 ### 20. Gestión de paquetes: NPM y package.json
+
+
 
 ### 21. Construyendo módulos: require e import
 
