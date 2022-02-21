@@ -6,8 +6,6 @@ Redes: [@CodingCarlos]()
 
 [TOC]
 
-
-
 ## Conocer los conceptos básicos de Node.js
 
 ### 1. Instalación de Node.js
@@ -505,6 +503,92 @@ El objeto `console` nos permite pasar información a la consola y lo podemos usa
 
 ### 14. Errores (try / catch)
 
+La declaración **`try...catch`** señala un bloque de instrucciones a intentar (**`try`**), y especifica una respuesta si se produce una excepción (**`catch`**).
+
+```js
+try {
+  nonExistentFunction();
+} catch (error) {
+  console.error(error);
+  // expected output: ReferenceError: nonExistentFunction is not defined
+  // Note - error messages will vary depending on browser
+}
+```
+
+#### Sintaxis
+
+```js
+try {
+   try_statements
+}
+[catch (exception_var_1 if condition_1) { // non-standard
+   catch_statements_1
+}]
+...
+[catch (exception_var_2) {
+   catch_statements_2
+}]
+[finally {
+   finally_statements
+}]
+```
+
+- `try_statements`
+
+  Las sentencias que serán ejecutadas.
+
+- `catch_statements_1`, `catch_statements_2`
+
+  Sentencias que se ejecutan si una excepción es lanzada en el bloque `try`.
+
+- `exception_var_1`, `exception_var_2`
+
+  Identificador que contiene un objeto de excepcion asociado a la cláusula `catch`.
+
+- `condition_1`
+
+  Una expresión condicional.
+
+- `finally_statements`
+
+  Sentencias que se ejecutan después de que se completa la declaración `try` . Estas sentencias se ejecutan independientemente de si una excepción fue lanzada o capturada.
+
+#### Descripción
+
+La sentencia `try` consiste en un bloque `try` que contiene una o más sentencias. Las llaves `{}` se deben utilizar siempre`,` incluso para una bloques de una sola sentencia. Al menos un bloque `catch` o un bloque `finally` debe estar presente. Esto nos da tres formas posibles para la sentencia `try`:
+
+1. `try...catch`
+2. `try...finally`
+3. `try...catch...finally`
+
+Un bloque `catch` contiene sentencias que especifican que hacer si una excepción es lanzada en el bloque `try`. Si cualquier sentencia dentro del bloque `try` (o en una funcion llamada desde dentro del bloque `try`) lanza una excepción, el control cambia inmediatamente al bloque `catch` . Si no se lanza ninguna excepcion en el bloque `try`, el bloque `catch` se omite.
+
+La bloque `finally` se ejecuta despues del bloque `try` y el/los bloque(s) `catch` hayan finalizado su ejecución. Éste bloque siempre se ejecuta, independientemente de si una excepción fue lanzada o capturada.
+
+Puede anidar una o más sentencias `try`. Si una sentencia `try` interna no tiene una bloque `catch`, se ejecuta el bloque `catch` de la sentencia `try` que la encierra.
+
+#### Bloques catch condicionales
+
+También se pueden crear "bloques `catch` condicionales", combinando bloques `try...catch` con estructuras `if...else if...else` como estas:
+
+```js
+try {
+    myroutine();  // puede lanzar tres tipos de excepciones
+} catch (e) {
+    if (e instanceof TypeError) {
+        // sentencias para manejar excepciones TypeError
+    } else if (e instanceof RangeError) {
+        // sentencias para manejar excepciones RangeError
+    } else if (e instanceof EvalError) {
+        // sentencias para manejar excepciones EvalError
+    } else {
+       // sentencias para manejar cualquier excepción no especificada
+       logMyErrors(e); // pasa el objeto de la excepción al manejador de errores
+}
+```
+
+---
+
 Cuando sucede un error y no es manejado adecuadamente en Node.js, la aplicación y posterior ejecución del código se detiene.
 
 Cada hilo funciona de manera independiente, por lo que en funciones asíncronas el error debe ser manejado dentro de las mismas, ya que estas pasarán a resolverse en el **Thread Pool** y el error se mandará desde allí hacia el hilo principal y detendrá la aplicación.
@@ -562,13 +646,116 @@ try {
 }
 ```
 
-### 15. Procesos hijo
+### 15. Procesos hijo (child_process)
 
+El módulo de procesos secundarios de Node.js (**child_process**) tiene funciones **spawn** y **exec**, mediante las cuales podemos iniciar un proceso secundario para ejecutar otros programas en el sistema.
 
+La diferencia más significativa entre child_process.spawn y child_process.exec está en lo que spawn devuelve un stream y exec devuelve un buffer.
+
+- Usa **spawn** cuando quieras que el proceso hijo devuelva datos binarios enormes a Node.
+- Usa **exec** cuando quieras que el proceso hijo devuelva mensajes de estado simples.
+- Usa **spawn** cuando quieras recibir datos desde que el proceso arranca.
+- Usa **exec** cuando solo quieras recibir datos al final de la ejecución.
+
+#### exec
+
+```js
+const { exec } = require('child_process');
+
+exec('cat *.js missing_file | wc -l', (error, stdout, stderr) => {
+  if (error) {
+    console.error(`exec error: ${error}`);
+    return;
+  }
+  console.log(`stdout: ${stdout}`);
+  console.error(`stderr: ${stderr}`);
+});
+```
+
+#### spawn (generar)
+
+Ejecutar `ls -lh /usr` y capturar `stdout`, `stderr` y cerrar el proceso:
+
+```js
+const { spawn } = require('child_process');
+
+const ls = spawn('ls', ['-lh', '/usr']);
+
+ls.stdout.on('data', (data) => {
+  console.log(`stdout: ${data}`);
+});
+
+ls.stderr.on('data', (data) => {
+  console.error(`stderr: ${data}`);
+});
+
+ls.on('close', (code) => {
+  console.log(`child process exited with code ${code}`);
+});
+```
 
 ### 16. Módulos nativos en C++
 
+JavaScript permite hacer uso de módulos nativos de c++. Para lograr esto debemos instalar `sudo npm i -g node-gyp`, este modulo de npm nos permite compilar módulos nativos de c++ en node.
+
+Luego debemos tener listo nuestro archivo de código fuente en c++ junto a otro archivo .gyp, que nos ayudara hacer la compilación a JavaScript.
+
+En este archivo .gyp le indicamos que va compilar, como se va llamar el archivo resultante y de donde va a tomar la info a convertir, todo esto lo dejamos como un json
+
+```json
+{
+  "targets": [
+    {   
+      "target_name": "addon",
+      "sources": [ "hola.cc" ]
+    }
+  ]
+}
+```
+
+luego le decimos a node que configure este modulo, con le comando `node-gyp configure`, como resultado tendremos en un directorio nuevo donde se encontraran diferentes archivos de código nativo, para finalizar con `node-gyp build` creamos nuestro modulo y estará listo para ser usado.
+
 ### 17. HTTP
+
+Node nos ofrece el modulo HTTP el cual nos permite principalmente crear un servidor en nuestro computador.
+En este modulo encontraremos todo lo necesario que necesitamos para crear un sistema de rutas, que responderá cada ruta, los header que podrá mandar, etc.
+Uno de los métodos principales de este modulo es createServer, el cual nos permitirá abrir un puerto para crear el servidor.
+
+```js
+const http = require('http');
+
+// Create a local server to receive data from
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({
+    data: 'Hello World!'
+  }));
+});
+
+server.listen(8000);
+```
+
+O también se puede crear de la siguiente forma:
+
+```js
+const http = require('http');
+
+// Create a local server to receive data from
+const server = http.createServer();
+
+// Listen to the request event
+server.on('request', (request, res) => {
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({
+    data: 'Hello World!'
+  }));
+});
+
+server.listen(8000);
+
+```
+
+
 
 ### 18. OS
 
