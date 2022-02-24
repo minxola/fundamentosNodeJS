@@ -913,17 +913,125 @@ This will still run.
 
 ### 20. Gestión de paquetes: NPM y package.json
 
+NPM es el gestor de paquetes de Node.js. 
 
+```bash
+npm init #Iniciar un proyecto
+npm i package-name #Instalar un paquete
+npm uninstall package-name #Desinstalar un paquete
+```
 
 ### 21. Construyendo módulos: require e import
 
+#### export
+
+```js
+export { name1, name2, …, nameN };
+export { variable1 as name1, variable2 as name2, …, nameN };
+export let name1, name2, …, nameN; // también var
+export let name1 = …, name2 = …, …, nameN; // también var, const
+export function FunctionName(){...}
+export class ClassName {...}
+
+export default expression;
+export default function (…) { … } // también class, function*
+export default function name1(…) { … } // también class, function*
+export { name1 as default, … };
+
+export * from …;
+export { name1, name2, …, nameN } from …;
+export { import1 as name1, import2 as name2, …, nameN } from …;
+export { default } from …;
+```
+
+#### import
+
+```js
+import defaultExport from "module-name";
+import * as name from "module-name";
+import { export } from "module-name";
+import { export as alias } from "module-name";
+import { export1 , export2 } from "module-name";
+import { export1 , export2 as alias2 , [...] } from "module-name";
+import defaultExport, { export [ , [...] ] } from "module-name";
+import defaultExport, * as name from "module-name";
+import "module-name";
+```
+
 ### 22. Módulos útiles
+
+#### bcrypt
+
+```bash
+npm i bcrypt #Nos ayuda a trabajar con contraseñas (hash password)
+```
+
+#### moment
+
+```bash
+npm i moment #Nos ayuda a trabajar con fechas
+```
+
+#### sharp.js
+
+```bash
+npm i sharp #Trabajar con imágenes, modificar tamaño, etc
+```
 
 ### 23. Datos almacenados vs en memoria
 
+- La información en memoria esta pensada para ser escrita rapida pero borrada tambien rapida.
+- La información almacenada en disco puede ser almacenada durante mucho mas tiempo pero es mucho mas lento escribir y leer en ellos.
+- Memoria RAM: Es la memoria de corto plazo del computador. Su función principal es recordar la información que tienes en cada una de las aplicaciones abiertas en el computador, mientras este se encuentre encendido.
+- Disco Duro: El disco duro guarda y protege los datos a largo plazo, lo que significa que quedarán guardados incluso si se apaga el computador.
+
 ### 24. Buffers
 
+Los buffer son conjuntos de datos en crudo, datos binarios, que podemos tratar en NodeJS para realizar diversos tipos de acciones. Los implementa Node a través de una clase específica llamada Buffer, que era necesaria porque Javascript tradicionalmente no era capaz de trabajar con tipos de datos binarios.
+
+```js
+import { Buffer } from 'buffer';
+
+// Creates a zero-filled Buffer of length 10.
+const buf1 = Buffer.alloc(10);
+
+// Creates a Buffer of length 10,
+// filled with bytes which all have the value `1`.
+const buf2 = Buffer.alloc(10, 1);
+
+// Creates an uninitialized buffer of length 10.
+// This is faster than calling Buffer.alloc() but the returned
+// Buffer instance might contain old data that needs to be
+// overwritten using fill(), write(), or other functions that fill the Buffer's
+// contents.
+const buf3 = Buffer.allocUnsafe(10);
+
+// Creates a Buffer containing the bytes [1, 2, 3].
+const buf4 = Buffer.from([1, 2, 3]);
+
+// Creates a Buffer containing the bytes [1, 1, 1, 1] – the entries
+// are all truncated using `(value & 255)` to fit into the range 0–255.
+const buf5 = Buffer.from([257, 257.5, -255, '1']);
+
+// Creates a Buffer containing the UTF-8-encoded bytes for the string 'tést':
+// [0x74, 0xc3, 0xa9, 0x73, 0x74] (in hexadecimal notation)
+// [116, 195, 169, 115, 116] (in decimal notation)
+const buf6 = Buffer.from('tést');
+
+// Creates a Buffer containing the Latin-1 bytes [0x74, 0xe9, 0x73, 0x74].
+const buf7 = Buffer.from('tést', 'latin1');
+```
+
 ### 25. Streams
+
+Las **Streams** son colecciones de datos, como matrices o cadenas. La diferencia es que las transmisiones pueden no estar disponibles de una vez y no tienen que caber en la memoria. Esto hace que las transmisiones sean realmente poderosas cuando se trabaja con grandes cantidades de datos, o datos que provienen de una fuente externa o un fragmento a la vez.
+
+Cuando un cliente solicita ese archivo grande, lo transmitimos un fragmento a la vez, lo que significa que no lo almacenamos en la memoria intermedia.
+
+Los streams son puntos de lectura de Buffers, con estos podemos declarar que acciones ejecutar cuando se recibe un buffer. Existen tres tipos de streams, stream de lectura, de escritura y de lectura y escritura.
+Un gran ejemplo de uso de los streams es el procesamiento de archivos grandes, como imágenes o videos, ya que podemos transformar estos a buffer y a través de los streams cargarlos o guardarlos parte por parte para mejorar el rendimiento de nuestro código.
+
+Un **stream** es el proceso de ir consumiendo datos al tiempo que se están recibiendo. En palabras del profesor, es el paso de datos entre un punto y otro.
 
 ## Conocer trucos que no quieren que sepas
 
