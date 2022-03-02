@@ -4,8 +4,6 @@ Por: **Carlos Hernandez**
 
 Redes: [@CodingCarlos]()
 
-[TOC]
-
 ## Conocer los conceptos básicos de Node.js
 
 ### 1. Instalación de Node.js
@@ -1031,20 +1029,282 @@ Cuando un cliente solicita ese archivo grande, lo transmitimos un fragmento a la
 Los streams son puntos de lectura de Buffers, con estos podemos declarar que acciones ejecutar cuando se recibe un buffer. Existen tres tipos de streams, stream de lectura, de escritura y de lectura y escritura.
 Un gran ejemplo de uso de los streams es el procesamiento de archivos grandes, como imágenes o videos, ya que podemos transformar estos a buffer y a través de los streams cargarlos o guardarlos parte por parte para mejorar el rendimiento de nuestro código.
 
-Un **stream** es el proceso de ir consumiendo datos al tiempo que se están recibiendo. En palabras del profesor, es el paso de datos entre un punto y otro.
+Un **stream** es el proceso de ir consumiendo datos al tiempo que se están recibiendo. En pocas palabras, es el paso de datos entre un punto y otro.
 
 ## Conocer trucos que no quieren que sepas
 
 ### 26. Benchmarking (console time y timeEnd)
 
+Una prueba de rendimiento o comparativa (en inglés **benchmark**) es una técnica utilizada para medir el rendimiento de un sistema o uno de sus componentes.
+
+#### console.time()
+
+Con `console.time()` podemos saber cuando tiempo toma en ejecutar cierta porción del código, basta encerrar el código a ejecutar entre `console.time()` y `console.timeEnd()`.
+
+```js
+console.time('Time');
+let sum = 0;
+for(let i = 0; i < 100; i++){
+    sum += i;
+}
+console.log(sum);
+//End of time counter
+console.timeEnd('Time');
+```
+
+Esto también aplica para funciones asíncronas:
+
+```js
+//en funciones asincronas
+function asyncFunc (){
+    return new Promise ((resolve) => {
+        setTimeout(function(){
+            console.log('End of the async process!');
+            resolve();
+        }, 4000);
+    });
+};
+
+console.time('Async');
+console.log('Start Async process!');
+asyncFunc()
+    .then(() => {
+        console.timeEnd('Async');
+    })
+```
+
 ### 27. Debugger
 
+Al correr el código de la consola lo podemos hacer con `node --inspect module/http.js` por ejemplo. El flag `--inspect` nos permite ir viendo los eventos que van sucediendo.
+
+Sin embargo si se trabaja con el navegador, también podemos hacer una inspección de lo que pasa con chrome dev tools. Por ejemplo podemos ir al local host de un servidor http creado con node: `localhost:3000`. En una nueva pestaña para inspeccionar podemos colocar en el espacio de url: `chrome://inspect`, y ahí nos aparecerá la opción para inspección para Node.
+
+Desde aquí podemos inspeccionar todo lo que pasa en nuestra aplicación, en *sources* podemos cargar la carpeta con la que estamos trabajando y agregar breakpoints. Podemos inspeccionar la memoria y  desde *profiler* inspeccionar por cierto tiempo nuestra aplicación.
+
 ### 28. Error First Callbacks
+
+Un patrón que se sigue siempre en cualquier lenguaje y programa de devs es **Error First Callbacks**, esto quiere decir que siempre que tengamos un callback el primer parámetro debería ser el error.
+
+> Esto se usa por la convención de que todo puede fallar.
+
+Otro patrón típico es tener el callback es tener en el callback como la última función que se pasa. Aunque depende del caso.
+
+```js
+function asincrona(callback) {
+    setTimeout(() => {
+        try {
+            let a = 3 + w
+            callback(null, a)
+        } catch (error) {
+            callback(error)
+        }
+    }, 1000)
+}
+
+asincrona((err, dato) => {
+    if (err) {
+        console.error('Tenemos un error')
+        console.error(err)
+        return false
+
+        // throw err; //no va funcionar en funciones asíncronas
+    }
+
+    console.log(`Todo ha ido bien, mi dato es ${dato}`)
+})
+```
 
 ## Manejar herramientas con Node
 
 ### 29. Scraping
 
+Web scraping es una técnica utilizada mediante programas de software para extraer información de sitios web. Usualmente, estos programas simulan la navegación de un humano en la World Wide Web ya sea utilizando el protocolo HTTP manualmente, o incrustando un navegador en una aplicación.
+
+Ejemplo con puppeteer:
+
+```js
+const puppeteer = require('puppeteer');
+
+(async () => {
+    console.log('Opening browser...');
+
+    //headless: false indica que podemos ver el navegador
+    //para el caso de test, en producción no sería necesario
+    //todo se hace en memoria
+    const browser = await puppeteer.launch({headless: false});
+
+    const page = await browser.newPage();
+
+    //visitar la página
+    await page.goto('https://es.wikipedia.org/wiki/Node.js');
+
+    //sacar un screenshot de la página
+    await page.screenshot({ path: 'screenshot.png' });
+
+    //Obtener el título de la página
+    var titulo1 = await page.evaluate(() =>{
+        const h1 = document.querySelector('h1');
+        return h1.innerHTML;
+    })
+
+    //Muestra el título de la página
+    console.log(titulo1); //Node.js
+
+    console.log('Closing browser...');
+    browser.close();
+    console.log('Browser closed...');
+})();
+```
+
+#### Puppeteer
+
+Most things that you can do manually in the browser can be done using Puppeteer! Here are a few examples to get you started:
+
+- Generate screenshots and PDFs of pages.
+- Crawl a SPA (Single-Page Application) and generate pre-rendered content (i.e. "SSR" (Server-Side Rendering)).
+- Automate form submission, UI testing, keyboard input, etc.
+- Create an up-to-date, automated testing environment. Run your tests directly in the latest version of Chrome using the latest JavaScript and browser features.
+- Capture a [timeline trace](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference) of your site to help diagnose performance issues.
+- Test Chrome Extensions.
+
+[Web de Puppeteer](https://pptr.dev/)
+
 ### 30. Automatización de procesos
 
+#### Gulp
+
+Gulp es un paquete de Node.js que nos permite automatizar diversos tipos de tareas.
+
+Gulp se utiliza para:
+
+-  Definir las tareas que se van a ejecutar en el proceso.
+-  Definir el orden de esas tareas y cuándo van ejecutarse.
+-  Paralelizar tareas.
+-  Ejecutar tareas condicionales, atendiendo a las condiciones y opciones que se hayan definido.
+
+Gulp se utiliza para el desarrollo web ejecutando todo tipo de tareas, de las que destacamos algunas como:
+
+-  Generar el CSS.
+-  Procesar el HTML para comprobar que todos los enlaces sean correctos.
+-  Empaquetar todo, ya sea JavaScript, CSS, HTML y con la estructura de directorios que queremos para ejecutar el script de la página web con el servidor.
+-  Optimizar imágenes.
+-  Desplegar la página web en el servidor.
+-  Generar documentación.
+
+```js
+//gulpfile.js
+const gulp = require('gulp');
+const server = require('gulp-server-livereload');
+
+//inicializar algo
+gulp.task('build', function(cb){
+    console.log('Building the site');
+    setTimeout(cb, 1200);
+});
+
+//inicializar un servidor y recargar automaticamente
+//la carpeta objetivo es 'www'
+gulp.task('serve', function(cb){
+    gulp.src('www')
+        .pipe(server({
+            livereload: true,
+            open: true,
+        }));
+})
+
+//encadenamiento de procesos, primero build, luego serve
+gulp.task('default', gulp.series('build', 'serve'));
+```
+
+El archivo `package.json`:
+
+```json
+{
+  "name": "automatizacion",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "gulp",
+    "build": "gulp build",
+    "serve": "gulp serve"
+  },
+  "keywords": [],
+  "author": "rem <email@email.com>",
+  "license": "MIT",
+  "dependencies": {
+    "gulp": "^4.0.2",
+    "gulp-server-livereload": "^1.9.2"
+  }
+}
+```
+
+Ejecución de comandos:
+
+```bash
+npm run build #Crea algun proceso
+npm run serve #levanta el servidor en www
+npm run start #Inicia primero build y luego serve, según lo especificado
+```
+
 ### 31. Aplicaciones de escritorio
+
+#### ¿Qué es Electron?
+
+Electron es un framework para crear aplicaciones de escritorio usando JavaScript, HTML y CSS. Incrustando [Chromium](https://www.chromium.org/) y [Node.js](https://nodejs.org/) dentro del mismo, Electron le permite mantener una base de código JavaScript y crear aplicaciones multiplataforma que funcionan en Windows, macOS y Linux, no requiere experiencia en desarrollo nativo.
+
+Para instalar usar `npm install electron`.
+
+Archivo básico para crear una app de escritorio:
+
+```js
+const { app, BrowserWindow } = require('electron');
+
+let ventanaPrincipal;
+
+app.on('ready', crearVentana)
+
+function crearVentana(){
+    ventanaPrincipal = new BrowserWindow({
+        width: 800,
+        height: 600,
+    })
+	
+    //llama el archivo a convertir
+    ventanaPrincipal.loadFile('index.html');
+}
+```
+
+En el archivo `package.json` se crea el comando para ejecutar electron:
+
+```json
+{
+  "name": "electron-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "rem <email@email.com>",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^17.1.0"
+  }
+}
+
+```
+
+Para ejecutar debemos correr el código en bash: `npm start`
+
+**Fin del curso**
+
+**Ahora sabes:**
+
+- Conocer los conceptos básicos de Node.js
+- Cómo manejar la asincronía
+- Entender los módulos del core
+- Utilizar los módulos y paquetes externos
+- Conocer trucos que no quieren que sepas
+- Manejar herramientas con Node.js

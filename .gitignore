@@ -1,3 +1,6 @@
 .vscode/
 modules/nativos/build/
 paquetes/utiles/node_modules/
+herramientas/scrapping/node_modules/
+herramientas/automatizacion/node_modules
+herramientas/electron/node_modules

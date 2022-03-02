@@ -24,9 +24,9 @@ process.stdout.write('tal'); */
 //-------
 const transform = stream.Transform;
 function Mayus(){
-    Transform.call(this);
+    transform.call(this);
 }
-util.inherits(Mayus, Transform);
+util.inherits(Mayus, transform);
 
 Mayus.prototype._transform = function (chunk, codif, cb){
     chunMayus = chunk.toString().toUpperCase();
